@@ -10,6 +10,47 @@ struct process
     int turnaroundTime;
     int waitingTime;
 };
+void findNonPreemptiveSJF(process pro[], int n)
+{
+    int currentTime = 0;
+    int complete = 0;
+
+    while (complete < n)
+    {
+        int shortestBurstTime = -1;
+        int minBurstTime = INT_MAX;
+
+        for (int i = 0; i < n; i++)
+        {
+            if (pro[i].arivalTime <= currentTime &&
+                pro[i].completionTime == 0 &&
+                pro[i].burstTime < minBurstTime)
+            {
+                minBurstTime = pro[i].burstTime;
+                shortestBurstTime = i;
+            }
+        }
+
+        if (shortestBurstTime == -1)
+        {
+            currentTime++;
+            continue;
+        }
+        currentTime += pro[shortestBurstTime].burstTime;
+
+        pro[shortestBurstTime].completionTime = currentTime;
+
+        pro[shortestBurstTime].turnaroundTime =
+            pro[shortestBurstTime].completionTime -
+            pro[shortestBurstTime].arivalTime;
+
+        pro[shortestBurstTime].waitingTime =
+            pro[shortestBurstTime].turnaroundTime -
+            pro[shortestBurstTime].burstTime;
+
+        complete++;
+    }
+}
 void findSJF(process pro[],int n){
     vector<int> remainingTime(n);
     for (int i = 0; i < n; i++) {
@@ -18,11 +59,12 @@ void findSJF(process pro[],int n){
 
     int currentTime = 0;
     int complete = 0;
-    int shortestBurstTime = -1;
-    int minBurstTime = 9999;
+    
+    
 
     while(complete<n){
-        minBurstTime = 9999;
+        int minBurstTime = 9999;
+        int shortestBurstTime = -1;
         for(int i = 0;i<n;i++){
             if(pro[i].arivalTime<=currentTime && remainingTime[i]<minBurstTime && remainingTime[i]>0 ){
                 minBurstTime = remainingTime[i];
@@ -62,8 +104,11 @@ int main()
     {
         cout << "Enter Process: " << i + 1 << endl;
         cin >> pro[i].processid >> pro[i].arivalTime>> pro[i].burstTime;
+        pro[i].completionTime = 0;
     }
     findSJF(pro,n);
+    // displayProcessDetails(pro,n);
+    // findNonPreemptiveSJF(pro,n);
     displayProcessDetails(pro,n);
 }
 /*
