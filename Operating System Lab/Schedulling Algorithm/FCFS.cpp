@@ -1,101 +1,38 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
+#include <bits/stdc++.h>
 using namespace std;
-
-struct Process {
-    string id;
-    int arrivalTime;
-    int burstTime;
-    int completionTime;
-    int turnaroundTime;
-    int waitingTime;
-};
-
-int main() {
-
+int main()
+{
     int n;
-
-    cout << "Enter number of processes: ";
     cin >> n;
-
-    vector<Process> p(n);
-
-    // Input
-    for (int i = 0; i < n; i++) {
-        cout << "\nProcess " << i + 1 << endl;
-
-        cout << "Process ID: ";
-        cin >> p[i].id;
-
-        cout << "Arrival Time: ";
-        cin >> p[i].arrivalTime;
-
-        cout << "Burst Time: ";
-        cin >> p[i].burstTime;
+    vector<int> at(n), bt(n), ct(n), tat(n), wt(n), process(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> at[i] >> bt[i];
+        process[i] = i;
     }
-
-    // Sort according to Arrival Time
-    sort(p.begin(), p.end(), [](Process a, Process b) {
-        return a.arrivalTime < b.arrivalTime;
-    });
-
-    int currentTime = 0;
-    double totalWaitingTime = 0;
-    double totalTurnaroundTime = 0;
-
-    // FCFS calculation
-    for (int i = 0; i < n; i++) {
-
-        // CPU remains idle if process has not arrived
-        if (currentTime < p[i].arrivalTime) {
-            currentTime = p[i].arrivalTime;
+    sort(process.begin(), process.end(), [&](int a, int b)
+         { return at[a] < at[b]; });
+    int time = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int j = process[i];
+        if(time<at[j]){
+            time = at[j];
         }
-
-        // Process executes completely
-        currentTime += p[i].burstTime;
-
-        // Completion Time
-        p[i].completionTime = currentTime;
-
-        // Turnaround Time
-        p[i].turnaroundTime =
-            p[i].completionTime - p[i].arrivalTime;
-
-        // Waiting Time
-        p[i].waitingTime =
-            p[i].turnaroundTime - p[i].burstTime;
-
-        totalWaitingTime += p[i].waitingTime;
-        totalTurnaroundTime += p[i].turnaroundTime;
+        
+        time += bt[j];
+        ct[j] = time;
+        tat[j] = ct[j] - at[j];
+        wt[j] = tat[j] - bt[j];
     }
-
-    // Output
-    cout << "\n\nFCFS Scheduling\n";
-
-    cout << "-------------------------------------------------------------\n";
-
-    cout << "PID\tAT\tBT\tCT\tTAT\tWT\n";
-
-    cout << "-------------------------------------------------------------\n";
-
-    for (int i = 0; i < n; i++) {
-        cout << p[i].id << "\t"
-             << p[i].arrivalTime << "\t"
-             << p[i].burstTime << "\t"
-             << p[i].completionTime << "\t"
-             << p[i].turnaroundTime << "\t"
-             << p[i].waitingTime << endl;
+    double tatsum = 0, wtsum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        tatsum += tat[i];
+        wtsum += wt[i];
     }
-
-    cout << "-------------------------------------------------------------\n";
-
-    cout << "Average Waiting Time: "
-         << totalWaitingTime / n << endl;
-
-    cout << "Average Turnaround Time: "
-         << totalTurnaroundTime / n << endl;
-
-    return 0;
+    for (auto i : process)
+        cout << "p" << i << " ";
+    cout << "avg tat : " << tatsum / n;
+    cout << "avg wt : " << wtsum / n;
 }
